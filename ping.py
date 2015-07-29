@@ -299,7 +299,7 @@ def detailed_ping(dest_addr, timeout = 2, count = 4, psize = 64):
 
         if delay != None:
             delay = delay * 1000
-            plist.append(delay)
+        plist.append(delay)
 
     # Find lost package percent
     percent_lost = 100 - (len(filter(None,plist)) * 100 / count)
