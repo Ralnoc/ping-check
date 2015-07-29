@@ -4,6 +4,7 @@ import argparse
 import ping
 import socket
 import time
+import datetime
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -35,12 +36,16 @@ def submit_graphite(metric, value, server, port):
 
 if __name__ == '__main__':
     args = get_args()
+    time_done = datetime.datetime.now()
     while True:
-        for idx in range(len(args.server)):
-            try:
-                ping_destination = ping.detailed_ping(args.server[idx], 5, 5, 1024)
-                for k, v in ping_destination.iteritems():
-                    submit_graphite(args.graphite_prefix + args.server[idx].replace('.', '_') + '.' + k, v, args.graphite_server, args.graphite_port)
-            except TypeError:
-                pass
-        time.sleep(60)
+        current_time = datetime.datetime.now()
+        if (current_time - time_done).seconds >= 60:
+            for idx in range(len(args.server)):
+                try:
+                    ping_destination = ping.detailed_ping(args.server[idx], 5, 5, 1024)
+                    for k, v in ping_destination.iteritems():
+                        submit_graphite(args.graphite_prefix + args.server[idx].replace('.', '_') + '.' + k, v, args.graphite_server, args.graphite_port)
+                except TypeError:
+                    pass
+                finally:
+                    time_done = datetime.datetime.now()
